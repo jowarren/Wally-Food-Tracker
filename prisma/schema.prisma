@@ -1,0 +1,22 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model FoodEntry {
+  id        String   @id @default(cuid())
+  date      String   // "YYYY-MM-DD"
+  mealTime  String   // "breakfast" | "morning-snack" | "lunch" | "afternoon-snack" | "dinner"
+  foodName  String
+  reaction  String   // "loved" | "liked" | "neutral" | "disliked" | "refused" | "allergic"
+  isNew     Boolean  @default(false)
+  notes     String   @default("")
+  createdAt DateTime @default(now())
+
+  @@index([date])
+  @@index([foodName])
+}

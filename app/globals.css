@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #fff1f2; /* rose-50 */
+}
