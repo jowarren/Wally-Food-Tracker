@@ -1,9 +1,9 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { prisma } from '@/lib/db';
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(req: NextRequest) {
   try {
@@ -45,21 +45,18 @@ Return ONLY a JSON array with no markdown, no explanation — just the raw JSON 
 {
   "name": "Meal name",
   "description": "One sentence describing the meal and why it suits the toddler",
-  "category": "breakfast" | "lunch" | "dinner" | "any",
+  "category": "breakfast" or "lunch" or "dinner" or "any",
   "ingredients": [
-    { "name": "ingredient name", "quantity": "amount", "isNew": true | false }
+    { "name": "ingredient name", "quantity": "amount", "isNew": true or false }
   ]
 }
 
 Mark isNew: true for ingredients the toddler hasn't tried yet (not in the loved/liked list).`;
 
-    const message = await client.messages.create({
-      model: 'claude-opus-4-7',
-      max_tokens: 2048,
-      messages: [{ role: 'user', content: prompt }],
-    });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
 
-    const text = message.content[0].type === 'text' ? message.content[0].text : '';
     const jsonMatch = text.match(/\[[\s\S]*\]/);
     if (!jsonMatch) throw new Error('No JSON array found in response');
 
