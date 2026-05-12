@@ -19,10 +19,14 @@ export async function GET(req: NextRequest) {
     dates.push(d.toISOString().slice(0, 10));
   }
 
-  const entries = await prisma.foodEntry.findMany({
-    where: { date: { in: dates } },
-    orderBy: { createdAt: 'asc' },
-  });
-
-  return Response.json({ entries });
+  try {
+    const entries = await prisma.foodEntry.findMany({
+      where: { date: { in: dates } },
+      orderBy: { createdAt: 'asc' },
+    });
+    return Response.json({ entries });
+  } catch (e) {
+    console.error('[/api/week]', e);
+    return Response.json({ error: String(e) }, { status: 500 });
+  }
 }
