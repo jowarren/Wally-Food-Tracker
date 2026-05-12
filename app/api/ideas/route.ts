@@ -53,7 +53,7 @@ Return ONLY a JSON array with no markdown, no explanation — just the raw JSON 
 
 Mark isNew: true for ingredients the toddler hasn't tried yet (not in the loved/liked list).`;
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const result = await model.generateContent(prompt);
     const text = result.response.text();
 
