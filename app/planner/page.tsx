@@ -43,13 +43,15 @@ export default function PlannerPage() {
 
   const loadPlan = useCallback(async () => {
     const res = await fetch(`/api/meal-plan?weekStart=${weekStart}`);
-    setPlan(await res.json());
+    if (res.ok) setPlan(await res.json());
     setGroceryItems(null);
     setSendResult(null);
   }, [weekStart]);
 
   useEffect(() => {
-    fetch('/api/meals').then((r) => r.json()).then(setMeals);
+    fetch('/api/meals')
+      .then((r) => r.json())
+      .then((data) => { if (Array.isArray(data)) setMeals(data); });
   }, []);
 
   useEffect(() => { loadPlan(); }, [loadPlan]);

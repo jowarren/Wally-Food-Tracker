@@ -36,7 +36,7 @@ export default function MealLibraryPage() {
 
   async function loadMeals() {
     const res = await fetch('/api/meals');
-    setMeals(await res.json());
+    if (res.ok) setMeals(await res.json());
   }
 
   useEffect(() => { loadMeals(); }, []);
