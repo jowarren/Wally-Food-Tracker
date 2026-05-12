@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Nav from '@/components/Nav';
 
 type Ingredient = { name: string; quantity: string; isNew?: boolean };
@@ -32,6 +32,19 @@ export default function IdeasPage() {
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState<Record<number, 'saving' | 'saved' | 'error'>>({});
 
+  // Restore from localStorage on mount
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem('meal-ideas-cache');
+      if (cached) {
+        const { suggestions: s, loved: lv, liked: lk } = JSON.parse(cached);
+        setSuggestions(s ?? []);
+        setLoved(lv ?? []);
+        setLiked(lk ?? []);
+      }
+    } catch {}
+  }, []);
+
   async function generate() {
     setLoading(true);
     setError(null);
@@ -45,9 +58,15 @@ export default function IdeasPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Failed to generate ideas');
-      setSuggestions(data.suggestions ?? []);
-      setLoved(data.loved ?? []);
-      setLiked(data.liked ?? []);
+      const s = data.suggestions ?? [];
+      const lv = data.loved ?? [];
+      const lk = data.liked ?? [];
+      setSuggestions(s);
+      setLoved(lv);
+      setLiked(lk);
+      try {
+        localStorage.setItem('meal-ideas-cache', JSON.stringify({ suggestions: s, loved: lv, liked: lk }));
+      } catch {}
     } catch (e) {
       setError((e as Error).message);
     } finally {

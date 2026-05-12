@@ -5,7 +5,7 @@ import Nav from '@/components/Nav';
 import { buildFoodHistory, type FoodSummary, type DbEntry } from '@/lib/store';
 import { REACTIONS, type Reaction } from '@/lib/types';
 
-type SortKey = 'name' | 'timesOffered' | 'lastOffered';
+type SortKey = 'name' | 'timesOffered' | 'lastOffered' | 'bestReaction';
 
 function BestReaction({ reactions }: { reactions: Record<Reaction, number> }) {
   const order: Reaction[] = ['loved', 'liked', 'neutral', 'disliked', 'refused', 'allergic'];
@@ -44,7 +44,7 @@ export default function HistoryPage() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('lastOffered');
-  const [filterAllergic, setFilterAllergic] = useState(false);
+  const [filterReaction, setFilterReaction] = useState<Reaction | ''>('');
   const [filterNew, setFilterNew] = useState(false);
 
   useEffect(() => {
@@ -56,9 +56,16 @@ export default function HistoryPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const reactionOrder: Reaction[] = ['loved', 'liked', 'neutral', 'disliked', 'refused', 'allergic'];
+
+  function bestReaction(f: FoodSummary): number {
+    const idx = reactionOrder.findIndex((r) => f.reactions[r] > 0);
+    return idx === -1 ? reactionOrder.length : idx;
+  }
+
   const filtered = foods
     .filter((f) => {
-      if (filterAllergic && !f.everAllergic) return false;
+      if (filterReaction && f.reactions[filterReaction] === 0) return false;
       if (filterNew && !f.isNew) return false;
       if (search && !f.name.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
@@ -66,6 +73,7 @@ export default function HistoryPage() {
     .sort((a, b) => {
       if (sortKey === 'name') return a.name.localeCompare(b.name);
       if (sortKey === 'timesOffered') return b.timesOffered - a.timesOffered;
+      if (sortKey === 'bestReaction') return bestReaction(a) - bestReaction(b);
       return b.lastOffered.localeCompare(a.lastOffered);
     });
 
@@ -114,10 +122,16 @@ export default function HistoryPage() {
             onChange={(e) => setSearch(e.target.value)}
             className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 w-52"
           />
-          <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer bg-white border border-slate-200 rounded-xl px-3 py-2 hover:bg-slate-50 select-none">
-            <input type="checkbox" checked={filterAllergic} onChange={(e) => setFilterAllergic(e.target.checked)} className="accent-rose-500" />
-            ⚠️ Allergic only
-          </label>
+          <select
+            value={filterReaction}
+            onChange={(e) => setFilterReaction(e.target.value as Reaction | '')}
+            className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-rose-400"
+          >
+            <option value="">All reactions</option>
+            {REACTIONS.map((r) => (
+              <option key={r.key} value={r.key}>{r.emoji} {r.label}</option>
+            ))}
+          </select>
           <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer bg-white border border-slate-200 rounded-xl px-3 py-2 hover:bg-slate-50 select-none">
             <input type="checkbox" checked={filterNew} onChange={(e) => setFilterNew(e.target.checked)} className="accent-rose-500" />
             ✨ First introductions
@@ -153,7 +167,7 @@ export default function HistoryPage() {
                 <tr>
                   <ColHeader label="Food" k="name" />
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Best Reaction</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 w-32">Breakdown</th>
+                  <ColHeader label="Breakdown" k="bestReaction" />
                   <ColHeader label="Offered" k="timesOffered" />
                   <ColHeader label="Last Offered" k="lastOffered" />
                 </tr>
