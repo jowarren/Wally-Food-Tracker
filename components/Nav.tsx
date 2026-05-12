@@ -11,6 +11,7 @@ const trackerLinks = [
 const plannerLinks = [
   { href: '/planner', label: '🗓️ Meal Planner' },
   { href: '/meal-library', label: '🍽️ Meal Library' },
+  { href: '/ideas', label: '💡 Meal Ideas' },
 ];
 
 export default function Nav() {
