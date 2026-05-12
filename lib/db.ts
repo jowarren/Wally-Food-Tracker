@@ -1,18 +1,24 @@
 import { PrismaNeon } from '@prisma/adapter-neon';
 import { PrismaClient } from './generated/prisma/client';
 
-// Prevent multiple instances of Prisma Client in development (hot reload creates new instances)
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+const globalForPrisma = global as unknown as { _prisma: PrismaClient | undefined };
 
-function makePrismaClient() {
-  const url = process.env.DATABASE_URL;
-  if (!url) throw new Error('DATABASE_URL environment variable is not set');
-  const adapter = new PrismaNeon({ connectionString: url });
-  return new PrismaClient({ adapter });
+function getClient(): PrismaClient {
+  if (!globalForPrisma._prisma) {
+    const url = process.env.DATABASE_URL;
+    if (!url) throw new Error('DATABASE_URL environment variable is not set');
+    const adapter = new PrismaNeon({ connectionString: url });
+    globalForPrisma._prisma = new PrismaClient({ adapter });
+  }
+  return globalForPrisma._prisma;
 }
 
-export const prisma = globalForPrisma.prisma ?? makePrismaClient();
-
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
-}
+// Proxy defers client creation until the first DB call so that importing
+// this module during Next.js build (when DATABASE_URL isn't available) doesn't throw.
+export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
+  get(_target, prop) {
+    const client = getClient();
+    const value = (client as any)[prop];
+    return typeof value === 'function' ? value.bind(client) : value;
+  },
+});
