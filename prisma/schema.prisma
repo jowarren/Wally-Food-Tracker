@@ -20,3 +20,51 @@ model FoodEntry {
   @@index([date])
   @@index([foodName])
 }
+
+// Meal planner models
+
+model Meal {
+  id          String           @id @default(cuid())
+  name        String           @unique
+  description String?
+  category    String           @default("any") // "breakfast" | "lunch" | "dinner" | "any"
+  ingredients MealIngredient[]
+  planEntries MealPlanEntry[]
+  createdAt   DateTime         @default(now())
+}
+
+model Ingredient {
+  id    String           @id @default(cuid())
+  name  String           @unique
+  meals MealIngredient[]
+}
+
+model MealIngredient {
+  id           String     @id @default(cuid())
+  meal         Meal       @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  mealId       String
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+  ingredientId String
+  quantity     String
+
+  @@unique([mealId, ingredientId])
+}
+
+model MealPlan {
+  id        String          @id @default(cuid())
+  weekStart String          @unique
+  entries   MealPlanEntry[]
+  createdAt DateTime        @default(now())
+}
+
+model MealPlanEntry {
+  id         String   @id @default(cuid())
+  mealPlan   MealPlan @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  mealPlanId String
+  meal       Meal     @relation(fields: [mealId], references: [id])
+  mealId     String
+  dayOfWeek  Int
+  mealType   String   // "breakfast" | "lunch" | "dinner"
+
+  @@unique([mealPlanId, dayOfWeek, mealType])
+}

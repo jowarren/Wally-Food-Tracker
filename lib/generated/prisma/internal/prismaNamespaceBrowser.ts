@@ -51,7 +51,12 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-  FoodEntry: 'FoodEntry'
+  FoodEntry: 'FoodEntry',
+  Meal: 'Meal',
+  Ingredient: 'Ingredient',
+  MealIngredient: 'MealIngredient',
+  MealPlan: 'MealPlan',
+  MealPlanEntry: 'MealPlanEntry'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -84,6 +89,55 @@ export const FoodEntryScalarFieldEnum = {
 export type FoodEntryScalarFieldEnum = (typeof FoodEntryScalarFieldEnum)[keyof typeof FoodEntryScalarFieldEnum]
 
 
+export const MealScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  category: 'category',
+  createdAt: 'createdAt'
+} as const
+
+export type MealScalarFieldEnum = (typeof MealScalarFieldEnum)[keyof typeof MealScalarFieldEnum]
+
+
+export const IngredientScalarFieldEnum = {
+  id: 'id',
+  name: 'name'
+} as const
+
+export type IngredientScalarFieldEnum = (typeof IngredientScalarFieldEnum)[keyof typeof IngredientScalarFieldEnum]
+
+
+export const MealIngredientScalarFieldEnum = {
+  id: 'id',
+  mealId: 'mealId',
+  ingredientId: 'ingredientId',
+  quantity: 'quantity'
+} as const
+
+export type MealIngredientScalarFieldEnum = (typeof MealIngredientScalarFieldEnum)[keyof typeof MealIngredientScalarFieldEnum]
+
+
+export const MealPlanScalarFieldEnum = {
+  id: 'id',
+  weekStart: 'weekStart',
+  createdAt: 'createdAt'
+} as const
+
+export type MealPlanScalarFieldEnum = (typeof MealPlanScalarFieldEnum)[keyof typeof MealPlanScalarFieldEnum]
+
+
+export const MealPlanEntryScalarFieldEnum = {
+  id: 'id',
+  mealPlanId: 'mealPlanId',
+  mealId: 'mealId',
+  dayOfWeek: 'dayOfWeek',
+  mealType: 'mealType'
+} as const
+
+export type MealPlanEntryScalarFieldEnum = (typeof MealPlanEntryScalarFieldEnum)[keyof typeof MealPlanEntryScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -98,4 +152,12 @@ export const QueryMode = {
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 

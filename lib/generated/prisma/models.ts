@@ -9,4 +9,9 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/FoodEntry'
+export type * from './models/Meal'
+export type * from './models/Ingredient'
+export type * from './models/MealIngredient'
+export type * from './models/MealPlan'
+export type * from './models/MealPlanEntry'
 export type * from './commonInputTypes'

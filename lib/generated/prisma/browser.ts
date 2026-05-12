@@ -22,3 +22,28 @@ export * from './enums';
  * 
  */
 export type FoodEntry = Prisma.FoodEntryModel
+/**
+ * Model Meal
+ * 
+ */
+export type Meal = Prisma.MealModel
+/**
+ * Model Ingredient
+ * 
+ */
+export type Ingredient = Prisma.IngredientModel
+/**
+ * Model MealIngredient
+ * 
+ */
+export type MealIngredient = Prisma.MealIngredientModel
+/**
+ * Model MealPlan
+ * 
+ */
+export type MealPlan = Prisma.MealPlanModel
+/**
+ * Model MealPlanEntry
+ * 
+ */
+export type MealPlanEntry = Prisma.MealPlanEntryModel
